@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "4000:4000"
+    networks:
+      - frontend_network
+networks:
+  frontend_network:
+    driver: bridge

@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import me from "../../../shared/stores/UserStore";
 import { GetAppointmentsListResponse } from "../types/api";
 import { appointments } from "../values/appointments";
@@ -51,10 +52,12 @@ export const getAppointmentsList = async (abortController: AbortController) => {
         });
     }
   } catch (error) {
-    if (error.name === "AbortError") {
-      console.log("Fetch aborted");
+    if (error instanceof AxiosError) {
+      console.error("Error in postConfirmationCode:", error);
+      return { status: 400, data: error.response?.data };
     } else {
-      console.error("Error fetching appointments:", error);
+      console.error("Unexpected error:", error);
+      return { status: 500, data: 'Unexpected error occurred' };
     }
   }
 };
@@ -80,7 +83,13 @@ const processAppointments = (jsonData: GetAppointmentsListResponse) => {
 
     console.log("Appointments updated. Current list:", appointments.value);
   } catch (error) {
-    console.error("Error processing appointments:", error);
+    if (error instanceof AxiosError) {
+      console.error("Error in postConfirmationCode:", error);
+      return { status: 400, data: error.response?.data };
+    } else {
+      console.error("Unexpected error:", error);
+      return { status: 500, data: { detail: 'Unexpected error occurred' }};
+    }
   }
 };
 

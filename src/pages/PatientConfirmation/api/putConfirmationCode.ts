@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PutConfirmationCodeRequest, PutConfirmationCodeResponse } from "../types";
 import me from "../../../shared/stores/UserStore";
 
@@ -21,7 +21,12 @@ export const putConfirmationCode = async (id: number, body: PutConfirmationCodeR
 
     return response
   } catch (error) {
-    console.log(error)
-    return {status: 400, data: error.response.data }
+    if (error instanceof AxiosError) {
+      console.error("Error in postConfirmationCode:", error);
+      return { status: 400, data: error.response?.data };
+    } else {
+      console.error("Unexpected error:", error);
+      return { status: 500, data: { detail: 'Unexpected error occurred' }};
+    }
   }
 };

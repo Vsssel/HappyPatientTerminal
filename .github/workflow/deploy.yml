@@ -1,0 +1,32 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Log in to Remote Server
+      env:
+        SSHPASS: ${{ secrets.SSH_PASS }}
+      run: |
+        sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 "echo 'Logged in successfully!'"
+
+    - name: Build Docker Image
+      run: docker build -t vue-frontend .
+
+    - name: Save and Deploy Docker Image
+      env:
+        SSHPASS: ${{ secrets.SSH_PASS }}
+      run: |
+        docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 "docker load && docker-compose -f /HappyPatient/terminal/docker-compose.yml up -d"
