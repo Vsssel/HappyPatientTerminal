@@ -31,7 +31,7 @@ jobs:
       run: |
         docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 <<EOF
           # Navigate to the project directory
-          cd /HappyPatient/front
+          cd /HappyPatient/terminal
 
           # Pull the latest code from GitHub
           git pull origin main
