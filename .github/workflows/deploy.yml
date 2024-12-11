@@ -29,4 +29,16 @@ jobs:
       env:
         SSHPASS: ${{ secrets.SSH_PASS }}
       run: |
-        docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 "docker load && docker-compose -f /HappyPatient/terminal/docker-compose.yml up -d"
+        docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 <<EOF
+          # Navigate to the project directory
+          cd /HappyPatient/front
+
+          # Pull the latest code from GitHub
+          git pull origin main
+
+          # Stop and remove the running Docker containers
+          docker-compose down
+
+          # Rebuild the Docker image and start the containers
+          docker-compose up --build -d
+        EOF
