@@ -20,7 +20,7 @@ jobs:
       env:
         SSHPASS: ${{ secrets.SSH_PASS }}
       run: |
-        sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 "echo 'Logged in successfully!'"
+        sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@localhost "echo 'Logged in successfully!'"
 
     - name: Build Docker Image
       run: docker build -t vue-frontend .
@@ -29,7 +29,7 @@ jobs:
       env:
         SSHPASS: ${{ secrets.SSH_PASS }}
       run: |
-        docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@64.225.71.203 <<EOF
+        docker save vue-frontend | sshpass -p "${SSHPASS}" ssh -o StrictHostKeyChecking=no root@localhost <<EOF
           # Navigate to the project directory
           cd /HappyPatient/terminal
 

@@ -10,7 +10,7 @@ export const putConfirmationCode = async (id: number, body: PutConfirmationCodeR
       throw new Error("Authorization token is missing.");
     }
     const response = await axios.put(
-      `http://64.225.71.203:2222/terminal/appointments/${id}`,
+      `http://localhost:2222/terminal/appointments/${id}`,
       body,
       {
         headers: {

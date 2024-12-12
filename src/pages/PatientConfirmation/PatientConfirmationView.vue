@@ -18,10 +18,16 @@
         <span class="text-info fs-5">
           You should confirm your presence by entering a confirmation code that we will send to your email.
         </span>
-        <button @click="sendCode" class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5" :disabled="loading">
+        <div class="w-100 d-flex flex-row gap-2">
+          <button @click="router.back()" class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5">
+            <i class="pi pi-arrow-left" />
+            <span>Back</span>
+          </button>
+          <button @click="sendCode" class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5" :disabled="loading">
           <i v-if="loading" class="pi pi-spin pi-spinner" />
           <span>Send confirmation code</span>
         </button>
+        </div>
       </div>
 
       <div v-else class="d-flex flex-column gap-3">
@@ -29,10 +35,16 @@
         <Select :options="paymentMethods" v-model="selectedPaymentMethod"/>
         <span class="text fs-5">Enter Confirmation Code:</span>
         <InputOtp v-model="code" class="align-self-center" />
-        <button @click="confirmCode"class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5" :disabled="loading">
-          <i v-if="loading" class="pi pi-spin pi-spinner" />
-          <span>Confirm</span>
-        </button>
+        <div class="w-100 d-flex flex-row gap-2">
+          <button @click="router.back()" class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5">
+            <i class="pi pi-arrow-left" />
+            <span>Back</span>
+          </button>
+          <button @click="confirmCode"class="btn btn-primary d-flex flex-row gap-3 align-items-center justify-content-center w-100 fs-5" :disabled="loading">
+            <i v-if="loading" class="pi pi-spin pi-spinner" />
+            <span>Confirm</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -41,13 +53,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { appointments } from '../PatientsList/values/appointments';
-import { getTerminalResources, postConfirmationCode, putConfirmationCode } from './api';
+import { ref, onBeforeMount } from 'vue';
+import { useRoute, useRouter } from 'vue-router'
+import { getTerminalAppointment, getTerminalResources, postConfirmationCode, putConfirmationCode } from './api';
 import InputOtp from 'primevue/inputotp';
 import Select from 'primevue/select';
 import Message from 'primevue/message';
+import { GetTerminalAppointmentResponse } from './types';
 
 const route = useRoute();
 const router = useRouter();
@@ -56,10 +68,10 @@ const id = +route.params.id;
 const isSent = ref(false);
 const code = ref('');
 const paymentMethods = ref<string[]>([]);
+const appointment = ref<GetTerminalAppointmentResponse['data']>()
 const selectedPaymentMethod = ref<string>();
 const res = ref<{ status: 'error' | 'success'; message: string } | null>(null)
 const loading = ref<boolean>(false)
-const appointment = appointments.value.find((app) => app.id === id) || null;
 
 const sendCode = async () => {
   try {
@@ -93,9 +105,10 @@ const confirmCode = async () => {
     });
     if (response.status < 400) {
       res.value = { status: 'success', message: response.data.detail };
-      setTimeout(() => router.back(), 1000)
-    } else {
+      setTimeout(() => router.back(), 1200)
+    } else if (response.status === 400){
       res.value = { status: 'error', message: response.data.detail };
+      setTimeout(() => router.back(), 1200)
     }
   } catch (error) {
     res.value = { status: 'error', message: 'Failed to confirm the code.' };
@@ -105,14 +118,21 @@ const confirmCode = async () => {
   }
 };
 
-onMounted(async () => {
+onBeforeMount(async () => {
   try {
     paymentMethods.value = await getTerminalResources();
+    const appointmentResponse = await getTerminalAppointment(id)
+    console.log(appointmentResponse)
+    appointment.value = appointmentResponse.data;
+    if (!appointment.value) {
+      res.value = { status: 'error', message: 'No appointment data found.' };
+    }
   } catch (error) {
-    res.value = { status: 'error', message: 'Failed to fetch payment methods.' };
+    res.value = { status: 'error', message: 'Failed to fetch appointment data.' };
     console.error(error);
   }
 });
+
 </script>
 
 <style>
