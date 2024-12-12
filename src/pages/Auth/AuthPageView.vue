@@ -9,7 +9,7 @@
         </div>
         <div class="d-flex w-100 flex-column gap-2">
           <span class="fs-5">Password: </span>
-          <Password v-model="password" input-class="w-100" eedback="false" toggle-mask/>
+          <Password v-model="password" input-class="w-100" :feedback="false" toggle-mask/>
         </div>
         <div class="w-100">
           <button type="submit" @click="loginAction" class="btn btn-primary w-100">Log in</button>
