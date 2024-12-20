@@ -10,7 +10,7 @@ export const getTerminalAppointment = async (id: number): Promise<GetTerminalApp
   }
 
   const response = await axios.get(
-    `http://localhost:2222/terminal/appointments/${id}`,
+    `http://64.225.71.203:2222/terminal/appointments/${id}`,
     {
       headers: {
         "Terminal-Auth": token,

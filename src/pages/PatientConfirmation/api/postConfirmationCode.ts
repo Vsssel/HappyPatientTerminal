@@ -11,7 +11,7 @@ export const postConfirmationCode = async (id: number): Promise<PostConfirmation
       throw new Error("Authorization token is missing.");
     }
     const response = await axios.post(
-      `http://localhost:2222/terminal/appointments/${id}`,
+      `http://64.225.71.203:2222/terminal/appointments/${id}`,
       {},
       {
         headers: {
