@@ -2,6 +2,7 @@ import { AxiosError } from "axios";
 import me from "../../../shared/stores/UserStore";
 import { GetAppointmentsListResponse } from "../types/api";
 import { appointments } from "../values/appointments";
+import { router } from "../../../../router";
 
 export const getAppointmentsList = async (abortController: AbortController) => {
   try {
@@ -11,13 +12,18 @@ export const getAppointmentsList = async (abortController: AbortController) => {
       return;
     }
 
-    const response = await fetch("http://localhost:2222/terminal/appointments", {
+    const response = await fetch("http://64.225.71.203:2222//terminal/appointments", {
       method: "GET",
       headers: {
         "Terminal-Auth": token
       },
       signal: abortController.signal
     });
+
+    if(response.status === 401) {
+      me.removeToke()
+      router.push('/auth')
+    }
 
     if (!response.ok) {
       console.error("Failed to connect to stream. Status:", response.status);
